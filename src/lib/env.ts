@@ -47,5 +47,5 @@ export function isWhatsAppConfigured(): boolean {
 export function getSiteUrl(): string {
   if (env.VITE_SITE_URL) return env.VITE_SITE_URL.replace(/\/$/, '');
   if (typeof window !== 'undefined') return window.location.origin;
-  return 'https://auraevents.in';
+  return 'https://www.auraeventservices.in';
 }
