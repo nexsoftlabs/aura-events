@@ -117,11 +117,22 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-white/10 py-8 text-xs text-ivory/45 sm:flex-row sm:items-center sm:justify-between">
-          <p>
+        <div className="grid gap-4 border-t border-white/10 py-8 text-xs text-ivory/45 sm:grid-cols-3 sm:items-center">
+          <p className="text-center sm:text-left">
             © {year} {siteConfig.legalName}. All rights reserved.
           </p>
-          <ul className="flex gap-6">
+          <p className="text-center">
+            Built by{' '}
+            <a
+              href="https://nexsoftlabs.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline text-ivory/55 hover:text-champagne-light"
+            >
+              Nexsoft Labs
+            </a>
+          </p>
+          <ul className="flex justify-center gap-6 sm:justify-end">
             {footerNav.legal.map((item) => (
               <li key={item.href}>
                 <Link to={item.href} className="hover:text-ivory">
