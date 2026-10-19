@@ -83,6 +83,16 @@ export function OrganizationJsonLd() {
     description: siteConfig.description,
     url: getSiteUrl(),
     ...(siteConfig.contact.email ? { email: siteConfig.contact.email } : {}),
+    ...(siteConfig.contact.phone ? { telephone: siteConfig.contact.phone } : {}),
+    ...(siteConfig.contact.address
+      ? {
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: siteConfig.contact.address,
+            addressCountry: 'IN',
+          },
+        }
+      : {}),
   });
   return null;
 }

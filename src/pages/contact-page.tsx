@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { Clock, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { Building2, Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { PageSeoHead } from '@/lib/seo';
 import { siteConfig } from '@/data/siteConfig';
 import { images } from '@/data/images';
@@ -7,16 +7,35 @@ import { ContactForm } from '@/features/contact/contact-form';
 import { PageHero } from '@/components/layout/page-hero';
 import { Container, Section } from '@/components/ui/container';
 import { Reveal } from '@/components/ui/reveal';
-import { getContactEmail, getWhatsAppLink } from '@/lib/contact-links';
+import {
+  getContactEmail,
+  getContactPhone,
+  getMapsSearchUrl,
+  getOfficeAddress,
+  getTelHref,
+  getWhatsAppLink,
+} from '@/lib/contact-links';
 
 export function ContactPage() {
   const [params] = useSearchParams();
   const service = params.get('service') ?? undefined;
   const email = getContactEmail();
+  const phone = getContactPhone();
+  const address = getOfficeAddress();
   const whatsapp = getWhatsAppLink('Hello Aura Events, I would like to enquire about an event.');
 
   const channels = [
     email ? { icon: Mail, label: 'Email', value: email, href: `mailto:${email}` } : null,
+    phone ? { icon: Phone, label: 'Phone', value: phone, href: getTelHref(phone) } : null,
+    address
+      ? {
+          icon: Building2,
+          label: 'Office',
+          value: address,
+          href: getMapsSearchUrl(address),
+          external: true,
+        }
+      : null,
     whatsapp ? { icon: MessageCircle, label: 'WhatsApp', value: 'Chat with our team', href: whatsapp, external: true } : null,
     { icon: MapPin, label: 'Service area', value: siteConfig.contact.serviceAreas.join(', ') },
     siteConfig.contact.businessHours ? { icon: Clock, label: 'Hours', value: siteConfig.contact.businessHours } : null,
@@ -60,7 +79,7 @@ export function ContactPage() {
                       </span>
                       <span>
                         <span className="eyebrow block text-bronze">{c.label}</span>
-                        <span className="mt-1 block text-sm text-midnight">{c.value}</span>
+                        <span className="mt-1 block text-sm leading-relaxed text-midnight">{c.value}</span>
                       </span>
                     </>
                   );

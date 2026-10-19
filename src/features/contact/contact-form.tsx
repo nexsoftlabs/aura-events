@@ -8,8 +8,7 @@ import { contactFormDefaultValues, contactFormSchema, type ContactFormValues } f
 import { useContactMutation } from '@/features/contact/useContactMutation';
 import { services, serviceCategories } from '@/data/services';
 import { budgetRanges } from '@/data/budgetRanges';
-import { isEmailJsConfigured } from '@/lib/env';
-import { getContactEmail, getWhatsAppLink } from '@/lib/contact-links';
+import { getWhatsAppLink } from '@/lib/contact-links';
 import { Button } from '@/components/ui/button';
 import { Field, Input, Select, Textarea } from '@/components/ui/form-controls';
 
@@ -40,9 +39,7 @@ const fieldKeys: (keyof ContactFormValues)[] = [
 export function ContactForm({ preselectedService }: ContactFormProps) {
   const mutation = useContactMutation();
   const [sent, setSent] = useState(false);
-  const configured = isEmailJsConfigured();
   const whatsapp = getWhatsAppLink('Hello Aura Events, I would like to enquire about an event.');
-  const email = getContactEmail();
 
   const defaultService =
     preselectedService && services.some((s) => s.slug === preselectedService)
@@ -74,33 +71,6 @@ export function ContactForm({ preselectedService }: ContactFormProps) {
   const onSubmit = handleSubmit(submit);
   const errorList = fieldKeys.filter((k) => errors[k]);
   const describedBy = (key: keyof ContactFormValues) => (errors[key] ? `${key}-error` : undefined);
-
-  if (!configured) {
-    return (
-      <div className="rounded-[1.5rem] border border-sand bg-ivory/60 p-8">
-        <AlertCircle aria-hidden className="size-6 text-bronze" />
-        <h2 className="mt-4 text-3xl text-midnight">Online enquiries are coming soon</h2>
-        <p className="mt-3 text-sm leading-relaxed text-mist">
-          Our enquiry form is being set up. In the meantime, please reach out directly and we will respond promptly.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          {whatsapp ? (
-            <Button asChild>
-              <a href={whatsapp} target="_blank" rel="noopener noreferrer">
-                <MessageCircle aria-hidden className="size-4" />
-                WhatsApp us
-              </a>
-            </Button>
-          ) : null}
-          {email ? (
-            <Button asChild variant="outline-dark">
-              <a href={`mailto:${email}`}>Email {email}</a>
-            </Button>
-          ) : null}
-        </div>
-      </div>
-    );
-  }
 
   if (sent) {
     return (

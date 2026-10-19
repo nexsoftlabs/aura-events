@@ -26,24 +26,43 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ## Environment variables
 
-Copy `.env.example` to `.env` and set:
+Copy `.env.example` to `.env` for local frontend config.
 
-- **EmailJS** — `VITE_EMAILJS_PUBLIC_KEY`, `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`
-- **Contact display** — `VITE_CONTACT_EMAIL_DISPLAY`
-- **WhatsApp** — `VITE_WHATSAPP_NUMBER` (digits only, e.g. `919876543210`)
-- **SEO** — `VITE_SITE_URL` (canonical URL, no trailing slash)
+**Public (Vite)** — bundled into the browser; never put Resend API keys here.
 
-Public `VITE_*` values are bundled into the client. Never put SMTP passwords or private API secrets in the frontend.
+- **Contact API** — optional `VITE_CONTACT_API_URL` (omit on Vercel to use same-origin `/api/*`)
+- **Display email** — `VITE_CONTACT_EMAIL_DISPLAY`
+- **WhatsApp** — `VITE_WHATSAPP_NUMBER` (digits only, e.g. `917908293247`)
+- **SEO** — `VITE_SITE_URL`
+- **EmailJS (optional fallback)** — `VITE_EMAILJS_*` only if you skip the Resend API
 
-### EmailJS setup
+**Server (Vercel → Project → Environment Variables)** — secrets stay on the server:
 
-1. Create an account at [emailjs.com](https://www.emailjs.com/) and verify your sending domain / inbox routing per their current free-tier limits.
-2. Create an **Email Service** connected to your inbox.
-3. Create an **Email Template** with variables matching the app:
-   - `from_name`, `from_email`, `reply_to`, `phone`, `service`, `service_slug`, `event_date`, `city`, `budget`, `guest_count`, `message`, `consent`, `submitted_at`, `to_email`, `html_message`
-4. Copy Public Key, Service ID and Template ID into `.env`.
-5. In EmailJS dashboard, **restrict allowed domains** to your production hostname.
-6. Submit a test enquiry from `/contact` and confirm delivery end-to-end before go-live.
+| Variable | Example | Purpose |
+|----------|---------|---------|
+| `RESEND_API_KEY` | `re_…` | Nexsoft Resend account |
+| `RESEND_FROM` | `Aura Events <info@auraeventservices.in>` | Must use a **verified** domain in Resend |
+| `CONTACT_INBOX` | `eventservices.aura@gmail.com` | Where enquiries are delivered |
+| `ALLOWED_ORIGINS` | production + preview + `http://127.0.0.1:5173` | CORS for `/api/contact` |
+
+### Resend enquiry flow (recommended)
+
+1. **Resend (Nexsoft)** — Verify domain `auraeventservices.in` (DNS below); use `RESEND_FROM=Aura Events <info@auraeventservices.in>`.
+2. Publish Resend DNS records at **Hostinger** (same place as site DNS); wait until Resend shows **Verified**.
+3. Create a **Resend API key** with send permission; add `RESEND_API_KEY` on Vercel for **Production** (and Preview if you test there).
+4. Set `CONTACT_INBOX` and `RESEND_FROM`; redeploy **aura-events**.
+5. Verify:
+   - `GET https://www.auraeventservices.in/api/health` → `{ "mailConfigured": true }`
+   - Submit `/contact` and confirm the inbox receives mail with **Reply-To** set to the visitor.
+
+### Local development
+
+| Command | Use |
+|---------|-----|
+| `npm run dev` | UI only — form shows “coming soon” unless API is reachable |
+| `npm run dev:full` | **Vercel dev** — runs Vite + `/api/contact` (add `RESEND_API_KEY` via `vercel env pull` or Vercel dashboard) |
+
+Legacy **EmailJS** still works as a fallback if the API returns not configured and `VITE_EMAILJS_*` is set.
 
 ## Editable content
 
@@ -69,7 +88,7 @@ Update `public/sitemap.xml` and `public/robots.txt` with your live domain.
 
 - [ ] Confirm marketing claims in `siteConfig` (event counts, awards, etc.)
 - [ ] Replace all demo images
-- [ ] Configure EmailJS + test enquiry delivery
+- [ ] Configure Resend (`RESEND_*` on Vercel) + test enquiry delivery
 - [ ] Set WhatsApp number and verify floating button
 - [ ] Add verified phone, address, business hours if applicable
 - [ ] Legal review of `privacy-policy` and `terms` pages
@@ -80,7 +99,7 @@ Update `public/sitemap.xml` and `public/robots.txt` with your live domain.
 ## Architecture
 
 - **Router** — `src/app/router.tsx` with lazy-loaded routes
-- **Contact** — `src/features/contact/` (Zod + React Hook Form + TanStack Query mutation + EmailJS)
+- **Contact** — `src/features/contact/` (form + TanStack Query); `api/contact.ts` (Resend)
 - **SEO** — `src/lib/seo.tsx` (client-side meta; consider prerender/SSR for stronger crawlers)
 
 ## License

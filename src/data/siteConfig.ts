@@ -18,10 +18,11 @@ export const siteConfig = {
     'Aura Events is a premier event management and branding company dedicated to crafting unforgettable experiences for brands and individuals. With a passion for creativity and a commitment to excellence, we have delivered hundreds of successful events across industries.',
   /** Supply verified contact details via environment or edit here */
   contact: {
-    email: import.meta.env.VITE_CONTACT_EMAIL_DISPLAY as string | undefined,
-    phone: undefined as string | undefined,
-    address: undefined as string | undefined,
-    city: 'India',
+    email:
+      (import.meta.env.VITE_CONTACT_EMAIL_DISPLAY as string | undefined) ?? 'eventservices.aura@gmail.com',
+    phone: '+91 7908293247',
+    address: 'Roshpa tower, 3rd Floor, Main Road, Ranchi, Jharkhand 834001',
+    city: 'Ranchi, Jharkhand',
     serviceAreas: ['Pan-India event management'] as string[],
     businessHours: undefined as string | undefined,
   },

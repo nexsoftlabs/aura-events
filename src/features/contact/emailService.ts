@@ -1,5 +1,6 @@
 import emailjs from '@emailjs/browser';
 import { env, isEmailJsConfigured } from '@/lib/env';
+import { contactSubmitUrl } from '@/lib/contact-api';
 import type { ContactFormValues } from '@/features/contact/schema';
 import { services } from '@/data/services';
 import { budgetRanges } from '@/data/budgetRanges';
@@ -29,6 +30,28 @@ export interface ContactEmailPayload {
 
 export interface ContactEmailService {
   send(payload: ContactEmailPayload): Promise<void>;
+}
+
+export class ApiContactService implements ContactEmailService {
+  async send({ values }: ContactEmailPayload): Promise<void> {
+    const res = await fetch(contactSubmitUrl(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+
+    const body = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
+
+    if (res.status === 503 || body.error === 'EMAIL_NOT_CONFIGURED') {
+      throw new Error('EMAIL_NOT_CONFIGURED');
+    }
+    if (res.status === 429 || body.error === 'THROTTLED') {
+      throw new Error('THROTTLED');
+    }
+    if (!res.ok) {
+      throw new Error(body.message || 'SEND_FAILED');
+    }
+  }
 }
 
 export class EmailJsContactService implements ContactEmailService {
@@ -77,4 +100,21 @@ export class EmailJsContactService implements ContactEmailService {
   }
 }
 
-export const contactEmailService: ContactEmailService = new EmailJsContactService();
+class CompositeContactService implements ContactEmailService {
+  private api = new ApiContactService();
+  private emailJs = new EmailJsContactService();
+
+  async send(payload: ContactEmailPayload): Promise<void> {
+    try {
+      await this.api.send(payload);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'EMAIL_NOT_CONFIGURED' && isEmailJsConfigured()) {
+        await this.emailJs.send(payload);
+        return;
+      }
+      throw error;
+    }
+  }
+}
+
+export const contactEmailService: ContactEmailService = new CompositeContactService();

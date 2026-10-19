@@ -31,12 +31,9 @@ test.describe('Aura Events smoke', () => {
   test('contact page', async ({ page }) => {
     await page.goto('/contact');
     const submit = page.getByRole('button', { name: /submit enquiry/i });
-    if (await submit.count()) {
-      await submit.click();
-      await expect(page.getByRole('alert').first()).toBeVisible();
-    } else {
-      await expect(page.getByText(/online enquiries are coming soon/i)).toBeVisible();
-    }
+    await expect(submit).toBeVisible();
+    await submit.click();
+    await expect(page.getByRole('alert').first()).toBeVisible();
   });
 
   test('no horizontal overflow on mobile', async ({ page }) => {

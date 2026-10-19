@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Mail, MessageCircle } from 'lucide-react';
+import { ArrowUpRight, Mail, MessageCircle, Phone } from 'lucide-react';
 import { siteConfig } from '@/data/siteConfig';
 import { footerNav } from '@/data/navigation';
 import { serviceCategories, getServicesByCategory } from '@/data/services';
 import { Container } from '@/components/ui/container';
 import { Logo } from '@/components/layout/logo';
-import { getContactEmail, getWhatsAppLink } from '@/lib/contact-links';
+import { getContactEmail, getContactPhone, getTelHref, getWhatsAppLink } from '@/lib/contact-links';
 
 export function Footer() {
   const year = new Date().getFullYear();
   const email = getContactEmail();
+  const phone = getContactPhone();
   const whatsapp = getWhatsAppLink('Hello Aura Events, I would like to enquire about an event.');
   const primaryCategories = serviceCategories.filter((c) => c.primary);
   const business = serviceCategories.find((c) => !c.primary);
@@ -46,6 +47,14 @@ export function Footer() {
                   <a href={`mailto:${email}`} className="inline-flex items-center gap-3 hover:text-champagne-light">
                     <Mail aria-hidden className="size-4 text-champagne" />
                     {email}
+                  </a>
+                </li>
+              ) : null}
+              {phone ? (
+                <li>
+                  <a href={getTelHref(phone)} className="inline-flex items-center gap-3 hover:text-champagne-light">
+                    <Phone aria-hidden className="size-4 text-champagne" />
+                    {phone}
                   </a>
                 </li>
               ) : null}

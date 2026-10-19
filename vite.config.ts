@@ -13,4 +13,13 @@ export default defineConfig({
       '@': path.resolve(root, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.VITE_DEV_API_PROXY ?? 'https://www.auraeventservices.in',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 });

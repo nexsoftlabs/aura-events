@@ -28,3 +28,5 @@ coverage
 
 # Build
 *.tsbuildinfo
+.vercel
+.env*

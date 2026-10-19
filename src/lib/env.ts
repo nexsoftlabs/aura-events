@@ -12,6 +12,7 @@ const envSchema = z.object({
       message: 'WhatsApp number must be digits only',
     }),
   VITE_SITE_URL: z.string().url().optional().or(z.literal('')),
+  VITE_CONTACT_API_URL: z.string().url().optional().or(z.literal('')),
   VITE_GA_MEASUREMENT_ID: z.string().optional(),
   VITE_ENABLE_ANALYTICS: z
     .enum(['true', 'false'])
